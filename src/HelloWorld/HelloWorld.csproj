@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.Core" Version="2.1.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.2.0" />
+    <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="2.4.0" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.8.20" />
+    <!-- <PackageReference Include="AWSSDK.S3" Version="3.3.110.19" /> -->
+    <PackageReference Include="itext7" Version="7.1.16" />
+    <PackageReference Include="Minio" Version="5.0.0" />
+  </ItemGroup>
+</Project>
