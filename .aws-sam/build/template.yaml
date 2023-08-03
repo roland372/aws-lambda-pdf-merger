@@ -8,7 +8,7 @@ Globals:
     Timeout: 10
     MemorySize: 128
 Resources:
-  HelloWorldFunction:
+  PdfMergerFunction:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Image
@@ -18,14 +18,14 @@ Resources:
           Properties:
             Path: /hello
             Method: get
-      ImageUri: helloworldfunction:dotnet6-v1
+      ImageUri: pdfmergerfunction:dotnet6-v1
     Metadata:
       DockerBuildArgs:
         SAM_BUILD_MODE: run
       DockerContext: /home/damianfatyga/WebstormProjects/sam-app-dotnet/src/HelloWorld
       DockerTag: dotnet6-v1
       Dockerfile: Dockerfile
-      SamResourceId: HelloWorldFunction
+      SamResourceId: PdfMergerFunction
 Outputs:
   HelloWorldApi:
     Description: API Gateway endpoint URL for Prod stage for Hello World function

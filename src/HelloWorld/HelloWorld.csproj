@@ -13,5 +13,6 @@
     <!-- <PackageReference Include="AWSSDK.S3" Version="3.3.110.19" /> -->
     <PackageReference Include="itext7" Version="7.1.16" />
     <PackageReference Include="Minio" Version="5.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>
