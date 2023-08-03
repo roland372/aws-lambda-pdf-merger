@@ -17,7 +17,7 @@ using System.IO;
 
 //? Postman
 // {
-//   "args": ["--files=1.pdf,2.pdf", "--filename=test.pdf"]
+//   "args": ["--files=1.pdf,2.pdf", "--bucket=00bucket", "--filename=test.pdf"]
 // }
 
 namespace HelloWorld
@@ -29,7 +29,7 @@ namespace HelloWorld
     private static string ACCESS_KEY = "Q3AM3UQ867SPQQA43P2F";
     private static string SECRET_KEY = "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG";
     private static string ENDPOINT = "https://play.min.io:9000";
-    private static string BUCKET_NAME = "00bucket";
+    private static string BUCKET_NAME;
     private static AmazonS3Config s3Config = new AmazonS3Config
     {
       ServiceURL = ENDPOINT,
@@ -63,6 +63,11 @@ namespace HelloWorld
           string filesString = item.Split("=")[1];
           FILES_TO_MERGE = filesString.Split(',');
         }
+        if (item.Contains("--bucket"))
+        {
+          string bucket = item.Split("=")[1];
+          BUCKET_NAME = bucket;
+        }
         if (item.Contains("--filename"))
         {
           string filename = item.Split("=")[1];
@@ -70,10 +75,10 @@ namespace HelloWorld
         }
       }
 
-      if (FILES_TO_MERGE?.Length < 1 || String.IsNullOrEmpty(FILENAME) || args.Length < 3)
+      if (String.IsNullOrEmpty(BUCKET_NAME) || FILES_TO_MERGE?.Length < 1 || String.IsNullOrEmpty(FILENAME) || args.Length < 3)
       {
         Console.WriteLine("Merge PDF failed. Please provide all of required arguments.");
-        Console.WriteLine("Example usage: --files=file1.pdf,file2.pdf --outdir=/outdir --filename=/outputFilename.pdf");
+        Console.WriteLine("Example usage: --files=file1.pdf,file2.pdf --bucket=00bucket --filename=/outputFilename.pdf");
         Environment.Exit(1);
       }
 
@@ -117,20 +122,21 @@ namespace HelloWorld
       await s3Client.PutObjectAsync(request);
       Console.WriteLine("Successfully uploaded " + objectName);
 
-      File.Delete(FILENAME);
 
       //! delete files from bucket after merging
-      foreach (string item in FILES_TO_MERGE)
-      {
-        DeleteObjectRequest delRequest = new DeleteObjectRequest
-        {
-          BucketName = BUCKET_NAME,
-          Key = item,
-        };
+      // File.Delete(FILENAME);
 
-        await s3Client.DeleteObjectAsync(delRequest);
-        Console.WriteLine("File: " + item + " deleted successfully");
-      }
+      // foreach (string item in FILES_TO_MERGE)
+      // {
+      //   DeleteObjectRequest delRequest = new DeleteObjectRequest
+      //   {
+      //     BucketName = BUCKET_NAME,
+      //     Key = item,
+      //   };
+
+      //   await s3Client.DeleteObjectAsync(delRequest);
+      //   Console.WriteLine("File: " + item + " deleted successfully");
+      // }
 
       return new APIGatewayProxyResponse
       {
