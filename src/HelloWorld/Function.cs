@@ -17,7 +17,7 @@ using System.IO;
 
 //? Postman
 // {
-//   "args": ["--files=1.pdf,2.pdf", "--outdir=/tmp", "--filename=test.pdf"]
+//   "args": ["--files=1.pdf,2.pdf", "--filename=test.pdf"]
 // }
 
 namespace HelloWorld
@@ -25,7 +25,6 @@ namespace HelloWorld
   public class Function
   {
     private static string[] FILES_TO_MERGE = new string[0];
-    private static string OUTPUT_FOLDER;
     private static string FILENAME;
     private static string ACCESS_KEY = "Q3AM3UQ867SPQQA43P2F";
     private static string SECRET_KEY = "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG";
@@ -46,15 +45,11 @@ namespace HelloWorld
     {
       public string[] args { get; set; }
     }
-
-    // public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest apigProxyEvent, ILambdaContext context)
     public async Task<APIGatewayProxyResponse> FunctionHandler(JsonElement apigProxyEvent, ILambdaContext context)
 
     {
-      // var args = JsonSerializer.Deserialize<Dictionary<string, string[]>>(apigProxyEvent.Body)["args"];
       DataToSend data = JsonSerializer.Deserialize<DataToSend>(apigProxyEvent.GetRawText());
       string[] args = data.args;
-      Console.WriteLine("<----- args ----->" + args);
 
       var body = new Dictionary<string, string[]>
             {
@@ -68,11 +63,6 @@ namespace HelloWorld
           string filesString = item.Split("=")[1];
           FILES_TO_MERGE = filesString.Split(',');
         }
-        if (item.Contains("--outdir"))
-        {
-          string outdir = item.Split("=")[1];
-          OUTPUT_FOLDER = outdir;
-        }
         if (item.Contains("--filename"))
         {
           string filename = item.Split("=")[1];
@@ -80,14 +70,14 @@ namespace HelloWorld
         }
       }
 
-      if (String.IsNullOrEmpty(OUTPUT_FOLDER) || FILES_TO_MERGE?.Length < 1 || String.IsNullOrEmpty(FILENAME) || args.Length < 3)
+      if (FILES_TO_MERGE?.Length < 1 || String.IsNullOrEmpty(FILENAME) || args.Length < 3)
       {
         Console.WriteLine("Merge PDF failed. Please provide all of required arguments.");
         Console.WriteLine("Example usage: --files=file1.pdf,file2.pdf --outdir=/outdir --filename=/outputFilename.pdf");
         Environment.Exit(1);
       }
 
-      PdfWriter writer = new PdfWriter(OUTPUT_FOLDER + "/" + FILENAME);
+      PdfWriter writer = new PdfWriter(FILENAME);
       writer.SetSmartMode(true);
       PdfDocument pdfDocument = new PdfDocument(writer);
       PdfMerger merger = new PdfMerger(pdfDocument);
@@ -114,10 +104,10 @@ namespace HelloWorld
       }
 
       pdfDocument.Close();
-      Console.WriteLine("Merging pdf done, created " + OUTPUT_FOLDER + "/" + FILENAME);
+      Console.WriteLine("Merging pdf done, created " + FILENAME);
 
       string objectName = FILENAME;
-      string filePath = "../../tmp/" + FILENAME;
+      string filePath = FILENAME;
 
       PutObjectRequest request = new PutObjectRequest();
       request.BucketName = BUCKET_NAME;
@@ -127,20 +117,20 @@ namespace HelloWorld
       await s3Client.PutObjectAsync(request);
       Console.WriteLine("Successfully uploaded " + objectName);
 
-      // File.Delete(OUTPUT_FOLDER + "/" + FILENAME);
+      File.Delete(FILENAME);
 
       //! delete files from bucket after merging
-      // foreach (string item in FILES_TO_MERGE)
-      // {
-      //   DeleteObjectRequest delRequest = new DeleteObjectRequest
-      //   {
-      //     BucketName = BUCKET_NAME,
-      //     Key = item,
-      //   };
+      foreach (string item in FILES_TO_MERGE)
+      {
+        DeleteObjectRequest delRequest = new DeleteObjectRequest
+        {
+          BucketName = BUCKET_NAME,
+          Key = item,
+        };
 
-      //   await s3Client.DeleteObjectAsync(delRequest);
-      //   Console.WriteLine("File: " + item + " deleted successfully");
-      // }
+        await s3Client.DeleteObjectAsync(delRequest);
+        Console.WriteLine("File: " + item + " deleted successfully");
+      }
 
       return new APIGatewayProxyResponse
       {
