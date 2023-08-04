@@ -22,7 +22,7 @@ Resources:
     Metadata:
       DockerBuildArgs:
         SAM_BUILD_MODE: run
-      DockerContext: /home/damianfatyga/WebstormProjects/sam-app-dotnet/src/HelloWorld
+      DockerContext: /home/damianfatyga/WebstormProjects/sam-app-dotnet-merger/src/HelloWorld
       DockerTag: dotnet6-v1
       Dockerfile: Dockerfile
       SamResourceId: PdfMergerFunction

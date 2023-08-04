@@ -15,11 +15,6 @@ using System.IO;
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
-//? Postman
-// {
-//   "args": ["--files=1.pdf,2.pdf", "--bucket=00bucket", "--filename=test.pdf"]
-// }
-
 namespace HelloWorld
 {
   public class Function
@@ -124,19 +119,19 @@ namespace HelloWorld
 
 
       //! delete files from bucket after merging
-      // File.Delete(FILENAME);
+      File.Delete(FILENAME);
 
-      // foreach (string item in FILES_TO_MERGE)
-      // {
-      //   DeleteObjectRequest delRequest = new DeleteObjectRequest
-      //   {
-      //     BucketName = BUCKET_NAME,
-      //     Key = item,
-      //   };
+      foreach (string item in FILES_TO_MERGE)
+      {
+        DeleteObjectRequest delRequest = new DeleteObjectRequest
+        {
+          BucketName = BUCKET_NAME,
+          Key = item,
+        };
 
-      //   await s3Client.DeleteObjectAsync(delRequest);
-      //   Console.WriteLine("File: " + item + " deleted successfully");
-      // }
+        await s3Client.DeleteObjectAsync(delRequest);
+        Console.WriteLine("File: " + item + " deleted successfully");
+      }
 
       return new APIGatewayProxyResponse
       {

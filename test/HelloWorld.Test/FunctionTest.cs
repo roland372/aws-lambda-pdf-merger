@@ -28,7 +28,7 @@ namespace HelloWorld.Tests
     [Fact]
     public async Task TestHelloWorldFunctionHandler()
     {
-            var request = new APIGatewayProxyRequest();
+            var request = new JsonElement();
             var context = new TestLambdaContext();
             string location = GetCallingIP().Result;
             Dictionary<string, string> body = new Dictionary<string, string>
